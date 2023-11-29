@@ -182,8 +182,12 @@ class EnhancedRemapper extends Remapper {
                     .forEach(m -> methods.put(m.getKey(), Optional.of(m)));
             } else {
                 this.parents = Collections.emptyList();
-                mcls.getFields().stream().map(f -> new MField(null, f)).forEach(f -> fields.put(f.getKey(), Optional.of(f)));
-                mcls.getMethods().stream().map(m -> new MMethod(null, m)).forEach(m -> methods.put(m.getKey(), Optional.of(m)));
+            }
+
+            // Always optionally add the methods from the mapping file in case the class file doesn't match the mapping file.
+            if (mcls != null) {
+                mcls.getFields().stream().map(f -> new MField(null, f)).forEach(f -> this.fields.putIfAbsent(f.getKey(), Optional.of(f)));
+                mcls.getMethods().stream().map(m -> new MMethod(null, m)).forEach(m -> this.methods.putIfAbsent(m.getKey(), Optional.of(m)));
             }
 
             for (MClass parentCls : parents) {
